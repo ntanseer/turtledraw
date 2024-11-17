@@ -1,0 +1,80 @@
+import turtle
+import math
+
+# Function to calculate the distance between two points
+def calculate_distance(x1, y1, x2, y2):
+    return math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
+
+# Function to draw based on the input file
+def draw_from_file(filename):
+    # Setup the turtle screen
+    screen = turtle.Screen()
+    screen.setup(width=450, height=450)
+    screen.tracer(0)  # Disable automatic screen updates for smoother drawing
+
+    # Create a turtle object
+    t = turtle.Turtle()
+    t.speed(0)  # Set turtle to maximum speed
+    t.penup()   # Start with the pen up
+
+    # Initialize total distance
+    total_distance = 0
+    prev_x, prev_y = 0, 0  # Starting point at the origin (0, 0)
+
+    # Open and read the input file
+    try:
+        with open(filename, 'r') as file:
+            for line in file:
+                line = line.strip()  # Remove leading/trailing whitespace
+                if line == 'stop':
+                    t.penup()  # Lift the pen to stop drawing
+                    continue
+
+                parts = line.split()  # Split the line into components
+
+                # Extract the color and coordinates
+                color = parts[0]
+                x = int(parts[1])
+                y = int(parts[2])
+
+                # Set the color
+                t.pencolor(color)
+
+                # Move to the new point without drawing
+                if t.isdown():
+                    distance = calculate_distance(prev_x, prev_y, x, y)
+                    total_distance += distance
+
+                t.goto(x, y)  # Move to the new position
+                t.pendown()    # Start drawing
+
+                # Update the previous position
+                prev_x, prev_y = x, y
+
+                # Update the screen for each move
+                screen.update()
+
+    except FileNotFoundError:
+        print("The specified file was not found.")
+        return
+
+    # Display the total distance on the screen
+    t.penup()
+    t.goto(150, -200)
+    t.write(f"Total Distance: {total_distance:.2f}", font=("Arial", 16, "normal"))
+    screen.update()
+
+    # Wait for the user to press enter before closing
+    turtle.done()
+
+# Main function
+def main():
+    # Ask the user for the input file name
+    filename = input("Please enter the input file name: ")
+
+    # Call the function to draw from the file
+    draw_from_file(filename)
+
+# Run the main function
+if __name__ == "__main__":
+    main()
